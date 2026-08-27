@@ -1,0 +1,156 @@
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: arial, sans-serif;
+    margin: 0;
+}
+
+:root {
+    --maincolor: SteelBlue;
+}
+
+.main {
+    margin: auto;
+    max-width: 50rem;
+    padding: 2rem 1rem 0 1rem;
+}
+
+.main a {
+    text-decoration: none;
+    color: var(--maincolor);
+}
+
+.main a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-bottom: 0.2rem;
+}
+
+.subtitle {
+    color: #555;
+    font-size: 1.1rem;
+    margin-top: 0;
+}
+
+.info {
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+h3 {
+    margin-top: 2.5rem;
+}
+
+hr.top-bar {
+    border: 1rem solid var(--maincolor);
+    margin: auto;
+    max-width: 48rem;
+}
+
+hr.normal {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    border: 1px solid var(--maincolor);
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.92rem;
+    margin-top: 0.5rem;
+}
+
+th, td {
+    text-align: left;
+    padding: 0.45rem 0.6rem;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    font-weight: bold;
+    border-bottom: 2px solid var(--maincolor);
+}
+
+tr.block-header td {
+    font-weight: bold;
+    font-size: 1.05rem;
+    color: var(--maincolor);
+    padding-top: 1.2rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid var(--maincolor);
+}
+
+tr.block-sep td {
+    border-top: 1px solid #ddd;
+}
+
+.session-num {
+    font-weight: bold;
+    color: var(--maincolor);
+    white-space: nowrap;
+}
+
+.topic {
+    width: 100%;
+}
+
+.materials a {
+    margin-right: 0.6rem;
+    font-size: 0.85rem;
+}
+
+.tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 0.25rem;
+    margin-left: 0.3rem;
+    vertical-align: middle;
+}
+
+.tag-lecture {
+    background: #d6eaf8;
+    color: #1a5276;
+}
+
+.tag-quiz {
+    background: #fdebd0;
+    color: #b9770e;
+}
+
+.tag-problems {
+    background: #d5f5e3;
+    color: #1e8449;
+}
+
+.tag-reading {
+    background: #f5eef8;
+    color: #7d3c98;
+}
+
+.tag-tba {
+    background: #eee;
+    color: #888;
+}
+
+.quote {
+    text-align: center;
+    font-size: 0.9rem;
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+}
+
+.session-past {
+    color: #333;
+}
+
+.session-future {
+    color: #999;
+}
+
+
