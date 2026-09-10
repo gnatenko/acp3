@@ -89,6 +89,16 @@ tr.block-sep td {
     border-top: 1px solid #ddd;
 }
 
+tr.standalone td {
+    background: #ffbb4e;
+}
+
+tr.spacer td {
+    border: none;
+    height: 1.2rem;
+    padding: 0;
+}
+
 .session-num {
     font-weight: bold;
     color: var(--maincolor);
