@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Markov normal algorithms</title>
+    <link rel="stylesheet" href="../style.css"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style>
+        .tool-main p.subtitle {
+            margin-bottom: 1.5rem;
+        }
+
+        .tool-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 40rem) {
+            .tool-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .tool-layout label {
+            display: block;
+            font-weight: bold;
+            color: var(--maincolor);
+            margin-bottom: 0.4rem;
+        }
+
+        .tool-layout textarea {
+            width: 100%;
+            box-sizing: border-box;
+            min-height: 8rem;
+            padding: 0.5rem;
+            font-family: Consolas, Menlo, monospace;
+            font-size: 0.95rem;
+            border: 1px solid var(--maincolor);
+            border-radius: 0.25rem;
+            resize: vertical;
+        }
+
+        .tool-window {
+            margin-top: 1rem;
+        }
+
+        .tool-window label {
+            display: block;
+            font-weight: bold;
+            color: var(--maincolor);
+            margin-bottom: 0.4rem;
+        }
+
+        .tool-window .computation {
+            width: 100%;
+            box-sizing: border-box;
+            height: 14rem;
+            overflow-y: auto;
+            padding: 0.5rem;
+            font-family: Consolas, Menlo, monospace;
+            font-size: 0.95rem;
+            background: #f7f9fb;
+            border: 1px solid var(--maincolor);
+            border-radius: 0.25rem;
+            white-space: pre;
+        }
+
+        .tool-buttons {
+            margin-top: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tool-buttons button {
+            font-family: arial, sans-serif;
+            font-size: 0.95rem;
+            padding: 0.45rem 1.2rem;
+            margin-right: 0.6rem;
+            border: 1px solid var(--maincolor);
+            border-radius: 0.25rem;
+            background: white;
+            color: var(--maincolor);
+            cursor: pointer;
+        }
+
+        .tool-buttons button:hover {
+            background: #eaf2f8;
+        }
+
+        .tool-buttons button.run {
+            background: var(--maincolor);
+            color: white;
+        }
+
+        .tool-buttons button.run:hover {
+            background: #3a75a7;
+        }
+
+        .computation .rule {
+            color: #666;
+            margin-left: 1.5rem;
+            font-style: italic;
+        }
+
+        .computation .result {
+            color: #1e8449;
+            font-weight: bold;
+        }
+
+        .computation .error {
+            color: #922b21;
+            font-weight: bold;
+        }
+
+        .computation .step {
+            font-weight: bold;
+            color: var(--maincolor);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="top"></div>
+    <hr class="top-bar">
+    <div class="main tool-main">
+
+        <h1>Markov normal algorithms</h1>
+        <p class="subtitle">
+            <a href="../index.html">&#8592; Back to the course page</a>
+        </p>
+
+        <div class="info">
+            <p>
+                Write the initial word in the input window. Type the algorithm
+                into the algorithm window, one rule per line. Press
+                <b>Step</b> to apply one rule, <b>Run</b> to apply rules
+                automatically (press again to stop), or <b>Reset</b> to start
+                over from the input word. Edits to the input or the algorithm
+                only take effect once you press <b>Reset</b>, which reloads the
+                word and the rules.
+            </p>
+        </div>
+
+        <div class="tool-layout">
+            <div>
+                <label for="markov-input">Input</label>
+                <textarea id="markov-input" spellcheck="false" placeholder="initial word, e.g. 11111"></textarea>
+            </div>
+            <div>
+                <label for="markov-rules">Algorithm</label>
+                <textarea id="markov-rules" spellcheck="false" placeholder="one rule per line, e.g.&#10;1 ->&#10;1 ->. 0"></textarea>
+            </div>
+        </div>
+
+        <div class="tool-window">
+            <label for="markov-comp">Computation</label>
+            <div id="markov-comp" class="computation"></div>
+        </div>
+
+        <div class="tool-buttons">
+            <button type="button" id="markov-step" class="step">Step</button>
+            <button type="button" id="markov-run" class="run">Run</button>
+            <button type="button" id="markov-reset" class="reset">Reset</button>
+        </div>
+
+        <hr class="normal">
+
+        <div class="info tool-info">
+            <p>
+                <b>Syntax.</b> Every rule is a line of the form
+                <code>lhs -&gt; rhs</code>. Empty left- and right-hand sides are
+                allowed: <code>-&gt; rhs</code>, <code>lhs -&gt;</code>, and <code>-&gt;</code>
+                are all valid syntax. A rule whose arrow is followed by a dot,
+                e.g. <code>lhs -&gt;. rhs</code>, is a
+                <em>halt</em> rule.
+            </p>
+            <p>
+                <b>Semantics.</b> Each step looks for the <em>first rule from the
+                top</em> whose left-hand side occurs in the word, and applies it
+                to the <em>leftmost</em> occurrence. The word is rewritten and
+                the search starts again from the first rule. An empty lhs or rhs stands for
+                &#949;, so <code>-&gt; rhs</code> inserts <code>rhs</code> at the
+                front of the word. A rule <code>lhs -&gt;</code> erases the
+                matched string. A rule <code>-&gt;</code> just does nothing.
+
+                The computation
+                stops (and the current word is the result) when a halt rule is
+                applied, or when no rule applies at all. Rules that never halt
+                are interrupted after 1000 steps.
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        const inputEl = document.getElementById('markov-input');
+        const rulesEl = document.getElementById('markov-rules');
+        const compEl = document.getElementById('markov-comp');
+        const stepBtn = document.getElementById('markov-step');
+        const runBtn = document.getElementById('markov-run');
+        const resetBtn = document.getElementById('markov-reset');
+
+        const MAX_STEPS = 1000;
+        const RUN_DELAY_MS = 300;
+
+        let word = '';
+        let rules = [];
+        let stepNo = 0;
+        let halted = false;
+        let runTimer = null;
+        let runDone = false;
+
+        function clearComp() {
+            compEl.textContent = '';
+        }
+
+        function line(html) {
+            const div = document.createElement('div');
+            div.innerHTML = html;
+            compEl.appendChild(div);
+            compEl.scrollTop = compEl.scrollHeight;
+        }
+
+        function lineStep(n, w) {
+            line('<span class="step">Step ' + n + ':</span> ' + dispWord(w));
+        }
+
+        function lineRule(s) {
+            line('<span class="rule">' + s + '</span>');
+        }
+
+        function lineResult(msg) {
+            line('<span class="result">&#9654; ' + msg + '</span>');
+        }
+
+        function lineError(msg) {
+            line('<span class="error">! ' + msg + '</span>');
+        }
+
+        function esc(s) {
+            return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function dispWord(w) {
+            return w === '' ? '&#949;' : esc(w);
+        }
+
+        function reset() {
+            stopRun();
+            runDone = false;
+            word = inputEl.value.replace(/\s+/g, '');
+            clearComp();
+            line('<span class="step">Step 0:</span> ' + dispWord(word));
+
+            rules = [];
+            const lines = rulesEl.value.split('\n');
+            let ok = true;
+            for (let i = 0; i < lines.length; i++) {
+                const t = lines[i].trim();
+                if (t === '') continue;
+                const terminal = t.indexOf('->.') !== -1;
+                const sep = terminal ? '->.' : '->';
+                const idx = t.indexOf(sep);
+                if (idx === -1) {
+                    lineError('line ' + (i + 1) + ': no "<b>-&gt;</b>" in "' + esc(t) + '"');
+                    ok = false;
+                    continue;
+                }
+                const lhs = t.slice(0, idx).trim();
+                const rhs = t.slice(idx + sep.length).trim();
+                rules.push({ lhs: lhs, rhs: rhs, terminal: terminal });
+            }
+            if (!ok) {
+                halted = true;
+                return;
+            }
+            if (rules.length === 0) {
+                lineError('no rules');
+                halted = true;
+                return;
+            }
+            stepNo = 1;
+            halted = false;
+        }
+
+        function applyLeftmost(w, lhs, rhs) {
+            if (lhs === '') return rhs + w;
+            const i = w.indexOf(lhs);
+            if (i === -1) return null;
+            return w.slice(0, i) + rhs + w.slice(i + lhs.length);
+        }
+
+        function step() {
+            if (halted) return;
+            if (stepNo > MAX_STEPS) {
+                lineError('too many steps (' + MAX_STEPS + '), giving up');
+                halted = true;
+                return;
+            }
+            for (let k = 0; k < rules.length; k++) {
+                const r = rules[k];
+                const next = applyLeftmost(word, r.lhs, r.rhs);
+                if (next === null) continue;
+                const lhsD = r.lhs === '' ? '' : esc(r.lhs);
+                const rhsD = r.rhs === '' ? '' : esc(r.rhs);
+                const arrowD = r.terminal ? '-&gt;.' : '-&gt;';
+                word = next;
+                lineStep(stepNo, dispWord(word));
+                lineRule(((lhsD ? lhsD + ' ' : '') + arrowD + (rhsD ? ' ' + rhsD : '')).trim());
+                stepNo++;
+                if (r.terminal) {
+                    lineResult('halt rule applied. Result: ' + dispWord(word));
+                    halted = true;
+                    return;
+                }
+                return;
+            }
+            lineResult('no rule applies. Result: ' + dispWord(word));
+            halted = true;
+        }
+
+        function startRun() {
+            stepBtn.disabled = true;
+            resetBtn.disabled = true;
+            runDone = false;
+            runBtn.textContent = 'Stop';
+            runTimer = setInterval(function () {
+                if (halted) {
+                    stopRun();
+                    return;
+                }
+                step();
+            }, RUN_DELAY_MS);
+        }
+
+        function stopRun() {
+            if (runTimer !== null) {
+                clearInterval(runTimer);
+                runTimer = null;
+            }
+            stepBtn.disabled = false;
+            resetBtn.disabled = false;
+            if (!runDone || runTimer !== null) {
+                runBtn.textContent = 'Run';
+            }
+            runDone = true;
+        }
+
+        stepBtn.addEventListener('click', function () {
+            if (halted) {
+                reset();
+            }
+            step();
+        });
+
+        runBtn.addEventListener('click', function () {
+            if (runTimer !== null) {
+                stopRun();
+            } else {
+                if (halted) reset();
+                startRun();
+            }
+        });
+
+        resetBtn.addEventListener('click', reset);
+
+        reset();
+    </script>
+</body>
+</html>
