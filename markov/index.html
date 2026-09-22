@@ -173,7 +173,7 @@
                 allowed: <code>-&gt; rhs</code>, <code>lhs -&gt;</code>, and <code>-&gt;</code>
                 are all valid syntax. A rule whose arrow is followed by a dot,
                 e.g. <code>lhs -&gt;. rhs</code>, is a
-                <em>halt</em> rule.
+                <em>terminal</em> rule.
             </p>
             <p>
                 <b>Semantics.</b> Each step looks for the <em>first rule from the
@@ -185,8 +185,8 @@
                 matched string. A rule <code>-&gt;</code> just does nothing.
 
                 The computation
-                stops (and the current word is the result) when a halt rule is
-                applied, or when no rule applies at all. Rules that never halt
+                stops (and the current word is the result) when a terminal rule is
+                applied, or when no rule applies at all. Algorithms that never terminate
                 are interrupted after 1000 steps.
             </p>
         </div>
@@ -310,7 +310,7 @@
                 lineStep(stepNo, dispWord(word));
                 stepNo++;
                 if (r.terminal) {
-                    lineResult('halt rule applied. Result: ' + dispWord(word));
+                    lineResult('terminal rule applied. Result: ' + dispWord(word));
                     halted = true;
                     return;
                 }
