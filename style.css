@@ -133,9 +133,19 @@ tr.spacer td {
     color: #b9770e;
 }
 
-.tag-problems {
+.tag-exercises {
+    background: #d6eaf8;
+    color: #1a5276;
+}
+
+.tag-solutions {
     background: #d5f5e3;
     color: #1e8449;
+}
+
+.tag-code {
+    background: #fadbd8;
+    color: #922b21;
 }
 
 .tag-reading {
